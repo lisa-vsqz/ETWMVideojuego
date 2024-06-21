@@ -11,10 +11,16 @@ public class RedHoodMovement : MonoBehaviour
     public LayerMask terrainLayer;
     public Rigidbody rb;
     public SpriteRenderer sr;
+    public SphereCollider collider; // Reference to the SphereCollider
+
+    private bool isCooldown = false; 
+    private bool isMoving = false;
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        collider = GetComponent<SphereCollider>(); // Make sure to assign this in the inspector
     }
 
     void Update()
@@ -47,11 +53,39 @@ public class RedHoodMovement : MonoBehaviour
         }
 
         // Check for jump input
-        if (Input.GetKeyDown(KeyCode.Space) )
+       if (Input.GetKeyDown(KeyCode.Space) && !isCooldown && !isMoving)
         {
-            rb.AddForce(new Vector3(x,0,10));
-            Debug.Log("a");
+            StartCoroutine(MoveCollider());
         }
+        
+    }
+
+    IEnumerator MoveCollider()
+    {
+        // Start moving
+        isMoving = true;
+
+        // Move collider up
+        Vector3 originalPosition = collider.center;
+        collider.center = new Vector3(collider.center.x, collider.center.y + 0.7f, collider.center.z);
+        
+        // Wait for 0.2 seconds
+        yield return new WaitForSeconds(0.6f);
+
+        // Move collider back to original position
+        collider.center = originalPosition;
+
+        // End moving
+        isMoving = false;
+
+        // Start cooldown
+        isCooldown = true;
+
+        // Wait for 1 second cooldown
+        yield return new WaitForSeconds(0.25f);
+
+        // End cooldown
+        isCooldown = false;
     }
 
 }

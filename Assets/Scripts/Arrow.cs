@@ -4,58 +4,60 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
-    
-    // [SerializeField] private float speed;
-    // private float direction;
-    // private bool hit;
+    [SerializeField] private float speed;
+    private bool hit;
+    private Animator anim;
+    private BoxCollider boxCollider;
+    private Rigidbody rb;
+    [SerializeField] private HealthEnemy enemyHealth;
+    private float damage = 1;
 
-    // private Animator anim;
-    // private BoxCollider boxCollider;
-
-    // private void Awake(){
-    //     anim = GetComponent<Animator>();
-    //     boxCollider = GetComponent<BoxCollider>();
-    // }
-
-    // private void Update(){
-    //     transform.Translate(Vector3.forward * speed * Time.deltaTime);
-    // }
-
-    
-    // private void OnTriggerEnter(Collider Collision){
-    //     hit = true;
-    //     boxCollider.enabled = false;
-    //     anim.SetTrigger("explode");
-    // }
-
-    // public void SetDirection(float _direction){
-    //     direction = _direction;
-    //     gameObject.SetActive(true);
-    //     hit = false;
-    //     boxCollider.enabled = true;
-
-    //     float localScaleX =  transform.localScale.x;
-    //     if( Mathf.Sign(localScaleX) != _direction){
-    //         localScaleX = -localScaleX;
-    //     }
-    //     transform.localScale = new Vector3(localScaleX, transform.localScale.y, transform.localScale.z);
-    // }
-
-    // private void DeActivate(){
-    //     gameObject.SetActive(false);
-    // }
-
-    public float life = 3;
- 
-    void Awake()
+    private void Awake()
     {
-        Destroy(gameObject, life);
+        anim = GetComponent<Animator>();
+        boxCollider = GetComponent<BoxCollider>();
+        rb = GetComponent<Rigidbody>();
     }
- 
+
+    private void Update()
+    {
+        if (!hit)
+        {
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        hit = true;
+        boxCollider.enabled = false;
+        anim.SetTrigger("explode");
+
+        if(other.tag == "Enemy")
+        {
+            enemyHealth.TakeDamage(damage);
+        }
+    }
+
+    public void SetDirection(float _direction)
+    {
+        gameObject.SetActive(true);
+        hit = false;
+        boxCollider.enabled = true;
+
+        Vector3 localScale = transform.localScale;
+        localScale.x = Mathf.Abs(localScale.x) * Mathf.Sign(_direction);
+        transform.localScale = localScale;
+    }
+
+    private void DeActivate()
+    {
+        gameObject.SetActive(false);
+        Destroy(gameObject);
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         Destroy(gameObject);
     }
-
-
 }

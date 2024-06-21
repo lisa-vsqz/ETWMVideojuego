@@ -5,10 +5,13 @@ using UnityEngine;
 public class ChangeAnimation : MonoBehaviour
 {
     private Animator anim;
+    [SerializeField] private Health playerHealth;
     // Start is called before the first frame update
+    private float healthBeforeDamage;
     void Start()
     {
         anim = GetComponent<Animator>(); // Initialize the Animator component
+        healthBeforeDamage = playerHealth.currentHealth;
     }
 
     // Update is called once per frame
@@ -33,6 +36,20 @@ public class ChangeAnimation : MonoBehaviour
             anim.SetTrigger("attack"); // Set the "jump" trigger to transition to the jump animation
         }
 
+        if (playerHealth.currentHealth < healthBeforeDamage)
+        {
+            anim.SetTrigger("hurt");
+            healthBeforeDamage = playerHealth.currentHealth;
+        }
+
+        
+
+    }
+
+    public void TakeDamage(float _damage)
+    {
+        playerHealth.TakeDamage(_damage);
+        anim.SetTrigger("hurt");        
     }
 
 
